@@ -1,0 +1,1 @@
+// API client with authentication wrapper - to be implemented
