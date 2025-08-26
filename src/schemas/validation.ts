@@ -9,8 +9,9 @@ export const groupSchema = z.object({
   Aantal_leerlingen_studenten: z.number()
     .min(1, 'Aantal leerlingen moet minimaal 1 zijn')
     .max(FORM_CONFIG.MAX_GROUP_SIZE, `Maximum ${FORM_CONFIG.MAX_GROUP_SIZE} personen per groep`),
-  Opleiding_niveau_en_leerjaar: z.string()
-    .min(1, 'Onderwijstype en leerjaar is verplicht'),
+  educationTypeIds: z.array(z.number())
+    .min(1, 'Selecteer minimaal één onderwijstype'),
+  educationTypeNames: z.array(z.string()),
   Toelichting: z.string().optional(),
   Aantal_begeleiders: z.number()
     .min(0, 'Aantal begeleiders mag niet negatief zijn')
@@ -35,9 +36,9 @@ export const groupSchema = z.object({
   }
 
   // Toelichting required for MBO/ISK
-  const needsToelichting = ['MBO', 'ISK'].some(type => 
-    data.Opleiding_niveau_en_leerjaar.toUpperCase().includes(type)
-  );
+  // MBO types: 3, 14, 24; ISK type: 29
+  const mboIskIds = [3, 14, 24, 29];
+  const needsToelichting = data.educationTypeIds.some(id => mboIskIds.includes(id));
   if (needsToelichting && (!data.Toelichting || data.Toelichting.trim().length === 0)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -52,7 +53,7 @@ export const teacherSchema = z.object({
   First_name: z.string().min(1, 'Voornaam is verplicht'),
   Middle_name: z.string().optional(),
   Last_name: z.string().min(1, 'Achternaam is verplicht'),
-  Primary_email: z.string()
+  Email_work: z.string()
     .min(1, 'Email is verplicht')
     .email('Ongeldig emailadres'),
   Mobile_phone: z.string()
@@ -64,8 +65,10 @@ export const teacherSchema = z.object({
 // School validation schema
 export const schoolSchema = z.object({
   lookupId: z.number().nullable(),
+  selectedSchoolName: z.string(),
   School_staat_niet_in_lijst: z.boolean(),
-  School_invul: z.string(),
+  schoolName: z.string(),
+  schoolAdres: z.string(),
   schoolType: z.number().nullable(),
   bekendFactuuradres: z.boolean(),
   existingFactuuradres: z.string(),
@@ -77,16 +80,16 @@ export const schoolSchema = z.object({
   // School selection validation
   const hasExistingSchool = data.lookupId !== null;
   const hasNewSchool = data.School_staat_niet_in_lijst && 
-                       data.School_invul.length > 0 && 
+                       data.schoolName.length > 0 && 
                        data.schoolType !== null;
   
   if (!hasExistingSchool && !hasNewSchool) {
     if (data.School_staat_niet_in_lijst) {
-      if (data.School_invul.length === 0) {
+      if (data.schoolName.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Schoolnaam is verplicht',
-          path: ['School_invul']
+          path: ['schoolName']
         });
       }
       if (data.schoolType === null) {

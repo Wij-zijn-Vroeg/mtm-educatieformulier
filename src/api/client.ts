@@ -50,10 +50,8 @@ export class CrossmarXApiClient {
   ): Promise<ApiResponse<T>> {
     const url = new URL(`${this.baseUrl}${endpoint}`);
     
-    // Add authentication for GET requests
-    if (!options.method || options.method === 'GET') {
-      this.addAuthParams(url);
-    }
+    // Always add authentication as query parameters for all requests
+    this.addAuthParams(url);
 
     const config: RequestInit = {
       ...options,
@@ -63,14 +61,6 @@ export class CrossmarXApiClient {
         ...options.headers,
       },
     };
-
-    // Add auth to POST body for non-GET requests
-    if (options.method && options.method !== 'GET' && options.body) {
-      const body = JSON.parse(options.body as string);
-      body.loginname = API_CONFIG.LOGIN_NAME;
-      body.password = API_CONFIG.PASSWORD;
-      config.body = JSON.stringify(body);
-    }
 
     try {
       const response = await fetch(url.toString(), config);

@@ -8,7 +8,8 @@ import { FORM_CONFIG } from '../utils/constants';
 export interface GroupData {
   id: string; // Internal UI ID for managing multiple groups
   Aantal_leerlingen_studenten: number;
-  Opleiding_niveau_en_leerjaar: string;
+  educationTypeIds: number[]; // Selected education type IDs for multi-select
+  educationTypeNames: string[]; // Display names of selected types
   Toelichting?: string; // Only for MBO/ISK (stored in separate field if needed)
   Aantal_begeleiders: number;
   stad: 'a' | 'd' | ''; // Amsterdam or Den Haag (for screening filter)
@@ -19,7 +20,7 @@ export interface TeacherData {
   First_name: string;
   Middle_name: string; // Tussenvoegsel
   Last_name: string;
-  Primary_email: string;
+  Email_work: string; // Correct field name for primary email
   Mobile_phone: string;
   Newsletter_education: boolean;
 }
@@ -27,8 +28,12 @@ export interface TeacherData {
 export interface SchoolData {
   // School selection
   lookupId: number | null; // Selected school ID from lookup
+  selectedSchoolName: string; // Store actual name when selected from DB
   School_staat_niet_in_lijst: boolean; // "School staat niet in lijst" checkbox
-  School_invul: string; // Manual school name/address entry
+  
+  // Manual school entry (split fields)
+  schoolName: string; // Just the school name
+  schoolAdres: string; // Just the school address
   schoolType: number | null; // Organisation type for new schools (from organisation_type)
   
   // Address handling
@@ -119,7 +124,8 @@ const initialState: BookingFormData = {
     {
       id: 'group1',
       Aantal_leerlingen_studenten: 0,
-      Opleiding_niveau_en_leerjaar: '',
+      educationTypeIds: [],
+      educationTypeNames: [],
       Toelichting: '',
       Aantal_begeleiders: 0,
       stad: '',
@@ -130,14 +136,16 @@ const initialState: BookingFormData = {
     First_name: '',
     Middle_name: '',
     Last_name: '',
-    Primary_email: '',
+    Email_work: '',
     Mobile_phone: '',
     Newsletter_education: false,
   },
   school: {
     lookupId: null,
+    selectedSchoolName: '',
     School_staat_niet_in_lijst: false,
-    School_invul: '',
+    schoolName: '',
+    schoolAdres: '',
     schoolType: null,
     bekendFactuuradres: false,
     existingFactuuradres: '',
@@ -183,7 +191,8 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
           const newGroup: GroupData = {
             id: `group${Date.now()}`,
             Aantal_leerlingen_studenten: 0,
-            Opleiding_niveau_en_leerjaar: '',
+            educationTypeIds: [],
+            educationTypeNames: [],
             Toelichting: '',
             Aantal_begeleiders: 0,
             stad: '',
@@ -232,16 +241,16 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
           // Basic required fields
           const hasBasicInfo = (
             group.Aantal_leerlingen_studenten > 0 &&
-            group.Opleiding_niveau_en_leerjaar.length > 0 &&
+            group.educationTypeIds.length > 0 &&
             group.Aantal_begeleiders >= 0 &&
             group.stad.length > 0 &&
             group.selectedScreeningId !== null
           );
           
           // Check toelichting requirement for MBO/ISK
-          const needsToelichting = ['MBO', 'ISK'].some(type => 
-            group.Opleiding_niveau_en_leerjaar.toUpperCase().includes(type)
-          );
+          // MBO types: 3, 14, 24; ISK type: 29
+          const mboIskIds = [3, 14, 24, 29];
+          const needsToelichting = group.educationTypeIds.some(id => mboIskIds.includes(id));
           const hasRequiredToelichting = !needsToelichting || (group.Toelichting && group.Toelichting.length > 0);
           
           // Check group size limit
@@ -258,14 +267,14 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
         // Required teacher fields
         const teacherValid = (
           teacher.Last_name.length > 0 &&
-          teacher.Primary_email.length > 0 &&
+          teacher.Email_work.length > 0 &&
           teacher.Mobile_phone.length > 0
         );
         
         // School selection valid
         const schoolValid = school.lookupId !== null || (
           school.School_staat_niet_in_lijst && 
-          school.School_invul.length > 0 &&
+          school.schoolName.length > 0 &&
           school.schoolType !== null
         );
         
@@ -292,15 +301,22 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
 
       // API data preparation
       preparePersonData: () => {
-        const { teacher } = get();
+        const { teacher, school } = get();
+        
+        // Determine school name for Other_school field
+        const schoolName = school.School_staat_niet_in_lijst 
+          ? school.schoolName // Use manually entered school name
+          : school.selectedSchoolName; // Use selected school name from DB
+        
         return {
           First_name: teacher.First_name,
           Middle_name: teacher.Middle_name || null,
           Last_name: teacher.Last_name,
-          Primary_email: teacher.Primary_email,
+          Email_work: teacher.Email_work, // Correct field name
           Mobile_phone: teacher.Mobile_phone,
           Newsletter_education: teacher.Newsletter_education,
-          Type: 56, // Docent type
+          Type: 56, // Docent type (required)
+          Other_school: schoolName, // Required to bypass school validation
         };
       },
 
@@ -309,33 +325,27 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
         if (!school.School_staat_niet_in_lijst || !school.schoolType) return null;
         
         return {
-          Name: school.School_invul.split('\n')[0] || school.School_invul, // First line as name
+          Name: school.schoolName, // Use dedicated school name field
           Type: school.schoolType,
         };
       },
 
       prepareAanmeldingData: () => {
         const state = get();
-        const { teacher, school, groups } = state;
-        
-        // Use first group for main record (others go to separate linking table)
-        const mainGroup = groups[0];
+        const { teacher, school } = state;
         
         return {
           // Contact info (duplicated from Person record)
           Naam_contactpersoon: `${teacher.First_name}${teacher.Middle_name ? ' ' + teacher.Middle_name : ''} ${teacher.Last_name}`,
-          E_mailadres: teacher.Primary_email,
+          E_mailadres: teacher.Email_work,
           Telefoonnummer: teacher.Mobile_phone,
           
           // School info
           School: school.lookupId,
           School_staat_niet_in_lijst: school.School_staat_niet_in_lijst,
-          School_invul: school.School_staat_niet_in_lijst ? school.School_invul : null,
-          
-          // Group info (main group)
-          Aantal_leerlingen_studenten: mainGroup.Aantal_leerlingen_studenten,
-          Opleiding_niveau_en_leerjaar: mainGroup.Opleiding_niveau_en_leerjaar,
-          Aantal_begeleiders: mainGroup.Aantal_begeleiders,
+          School_invul: school.School_staat_niet_in_lijst 
+            ? `${school.schoolName}\n${school.schoolAdres}`.trim() 
+            : null,
           
           // Address/billing
           Factuuradres_keuze: school.Factuuradres_keuze,
