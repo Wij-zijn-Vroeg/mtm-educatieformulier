@@ -102,7 +102,6 @@ interface BookingStoreActions {
   
   // Form validation
   isStep1Valid: () => boolean;
-  isStep1ValidWithScreenings: (screeningsData: Record<string, any>) => boolean;
   isStep2Valid: () => boolean;
   
   // Utility

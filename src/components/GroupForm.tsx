@@ -13,13 +13,15 @@ interface GroupFormProps {
   groupIndex: number;
   onRemove?: () => void;
   showRemoveButton?: boolean;
+  onScreeningsLoaded?: (groupId: string, screenings: ScreeningData[]) => void;
 }
 
 export const GroupForm: React.FC<GroupFormProps> = ({
   groupId,
   groupIndex,
   onRemove,
-  showRemoveButton = false
+  showRemoveButton = false,
+  onScreeningsLoaded
 }) => {
   const { groups, updateGroup, getTotalPeopleInGroup } = useBookingStore();
   const group = groups.find(g => g.id === groupId);
@@ -66,6 +68,11 @@ export const GroupForm: React.FC<GroupFormProps> = ({
         const educationTypeIds = group.educationTypeIds.length > 0 ? group.educationTypeIds : undefined;
         const data = await screeningApi.getScreenings(group.stad, educationTypeIds);
         setScreenings(data);
+        
+        // Report loaded screenings to parent
+        if (onScreeningsLoaded) {
+          onScreeningsLoaded(groupId, data);
+        }
       } catch (err) {
         setError('Kon filmvertoningen niet laden');
         console.error('Failed to load screenings:', err);
