@@ -1,12 +1,14 @@
 // Confirmation page for successful booking submission
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useBookingStore } from '../store/bookingStore';
 import { bookingApi, screeningApi } from '../api/endpoints';
 import type { ScreeningData } from '../api/endpoints';
 import { formatDutchDate, formatTime } from '../utils/dateUtils';
 
 export const Confirmation: React.FC = () => {
+  const navigate = useNavigate();
   const store = useBookingStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<{
@@ -15,8 +17,9 @@ export const Confirmation: React.FC = () => {
     error?: string;
   } | null>(null);
   const [groupScreenings, setGroupScreenings] = useState<Record<string, ScreeningData>>({});
+  const [capacityWarnings, setCapacityWarnings] = useState<string[]>([]);
 
-  // Load screening details for all groups
+  // Load screening details for all groups - always fetch fresh data
   useEffect(() => {
     const loadScreeningDetails = async () => {
       const screeningIds = store.groups
@@ -26,7 +29,7 @@ export const Confirmation: React.FC = () => {
       if (screeningIds.length === 0) return;
       
       try {
-        // Get all screenings for Amsterdam and Den Haag to find our selections
+        // Always fetch fresh screening data to get current available seats
         const [amsterdamScreenings, denHaagScreenings] = await Promise.all([
           screeningApi.getScreenings('a'),
           screeningApi.getScreenings('d')
@@ -34,15 +37,30 @@ export const Confirmation: React.FC = () => {
         
         const allScreenings = [...amsterdamScreenings, ...denHaagScreenings];
         const screeningMap: Record<string, ScreeningData> = {};
+        const warnings: string[] = [];
         
         for (const screeningId of screeningIds) {
           const screening = allScreenings.find(s => s.id.toString() === screeningId);
           if (screening) {
             screeningMap[screeningId] = screening;
+            
+            // Check if any group requesting this screening exceeds capacity
+            const groupsForThisScreening = store.groups.filter(g => g.selectedScreeningId === screeningId);
+            for (const group of groupsForThisScreening) {
+              const totalPeople = group.Aantal_leerlingen_studenten + group.Aantal_begeleiders;
+              if (screening.Beschikbare_plekken_educatie !== null && 
+                  screening.Beschikbare_plekken_educatie < totalPeople) {
+                const groupIndex = store.groups.findIndex(g => g.id === group.id);
+                warnings.push(
+                  `Groep ${groupIndex + 1}: ${screening.Title_in_use} op ${formatDutchDate(screening.Datum)} heeft onvoldoende plekken (${screening.Beschikbare_plekken_educatie} beschikbaar, ${totalPeople} aangevraagd)`
+                );
+              }
+            }
           }
         }
         
         setGroupScreenings(screeningMap);
+        setCapacityWarnings(warnings);
       } catch (error) {
         console.error('Failed to load screening details:', error);
       }
@@ -70,9 +88,27 @@ export const Confirmation: React.FC = () => {
       );
 
       if (!availabilityCheck.available) {
+        // Build detailed error message with specific screenings
+        let errorMessage = 'Er zijn niet genoeg plaatsen beschikbaar voor de volgende vertoning(en):\n\n';
+        
+        for (const conflict of availabilityCheck.conflicts) {
+          const screening = Object.values(groupScreenings).find(s => s.id.toString() === conflict.screeningId);
+          if (screening) {
+            errorMessage += `• ${screening.Title_in_use}\n`;
+            errorMessage += `  ${formatDutchDate(screening.Datum)} om ${formatTime(screening.Aanvang)}\n`;
+            errorMessage += `  ${screening.Naam}, ${screening.Stad === 'a' ? 'Amsterdam' : 'Den Haag'}\n`;
+            errorMessage += `  Beschikbaar: ${conflict.available}, Aangevraagd: ${conflict.requested}\n\n`;
+          } else {
+            errorMessage += `• Vertoning ID ${conflict.screeningId}\n`;
+            errorMessage += `  Beschikbaar: ${conflict.available}, Aangevraagd: ${conflict.requested}\n\n`;
+          }
+        }
+        
+        errorMessage += 'Pas uw aanmelding aan en probeer opnieuw.';
+        
         setSubmitResult({
           success: false,
-          error: 'Er zijn niet genoeg plaatsen beschikbaar voor één of meer vertoningen. Pas uw aanmelding aan en probeer opnieuw.'
+          error: errorMessage
         });
         return;
       }
@@ -131,12 +167,19 @@ export const Confirmation: React.FC = () => {
         <div className="error-message">
           <div className="error-icon">✗</div>
           <h1>Aanmelding mislukt</h1>
-          <p className="error-text">
-            {submitResult.error}
-          </p>
+          <div className="error-text">
+            {submitResult.error.split('\n').map((line, index) => (
+              <div key={index} className={line.trim() === '' ? 'mb-2' : ''}>
+                {line || '\u00A0'}{/* Non-breaking space for empty lines */}
+              </div>
+            ))}
+          </div>
           <div className="error-actions">
             <button
-              onClick={() => store.setCurrentStep(2)}
+              onClick={() => {
+                store.setCurrentStep(2);
+                navigate('/stap-2');
+              }}
               className="btn btn-primary"
             >
               Terug naar contactgegevens
@@ -161,6 +204,28 @@ export const Confirmation: React.FC = () => {
           Controleer uw gegevens en verstuur de aanmelding.
         </p>
       </div>
+
+      {/* Capacity warnings */}
+      {capacityWarnings.length > 0 && (
+        <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-start">
+            <div className="text-red-600 text-xl mr-3">⚠️</div>
+            <div>
+              <h3 className="text-red-800 font-semibold mb-2">
+                Onvoldoende beschikbare plekken
+              </h3>
+              <div className="text-red-700 text-sm space-y-1">
+                {capacityWarnings.map((warning, index) => (
+                  <div key={index}>{warning}</div>
+                ))}
+                <div className="mt-3 font-medium">
+                  De beschikbare plekken zijn veranderd sinds u de eerste stap heeft ingevuld. U kunt de aanmelding niet versturen totdat u uw groepsgrootte aanpast of een andere vertoning selecteert.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary */}
       <div className="space-y-6 mb-8">
@@ -196,6 +261,11 @@ export const Confirmation: React.FC = () => {
                       {screening.Capaciteit && (
                         <div>
                           <strong>Capaciteit zaal:</strong> {screening.Capaciteit}
+                        </div>
+                      )}
+                      {screening.Beschikbare_plekken_educatie !== null && (
+                        <div>
+                          <strong>Beschikbare plekken:</strong> {screening.Beschikbare_plekken_educatie}
                         </div>
                       )}
                     </div>
@@ -252,17 +322,25 @@ export const Confirmation: React.FC = () => {
       <div className="navigation-buttons">
         <button
           type="button"
-          onClick={() => store.setCurrentStep(2)}
+          onClick={() => {
+            if (capacityWarnings.length > 0) {
+              store.setCurrentStep(1);
+              navigate('/stap-1');
+            } else {
+              store.setCurrentStep(2);
+              navigate('/stap-2');
+            }
+          }}
           className="btn btn-secondary"
           disabled={isSubmitting}
         >
-          Terug naar contactgegevens
+          {capacityWarnings.length > 0 ? 'Terug naar filmkeuze' : 'Terug naar contactgegevens'}
         </button>
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="btn btn-primary"
+          disabled={isSubmitting || capacityWarnings.length > 0}
+          className={`btn ${capacityWarnings.length > 0 ? 'btn-disabled' : 'btn-primary'}`}
         >
           {isSubmitting ? 'Versturen...' : 'Aanmelding versturen'}
         </button>

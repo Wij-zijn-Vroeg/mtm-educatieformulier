@@ -6,7 +6,7 @@ import type { GroupData } from '../store/bookingStore';
 import { screeningApi } from '../api/endpoints';
 import type { ScreeningData, EducationTypeData } from '../api/endpoints';
 import { FORM_CONFIG } from '../utils/constants';
-import { formatScreeningDateTime, formatDutchDate, formatTime } from '../utils/dateUtils';
+import { formatDutchDate, formatTime } from '../utils/dateUtils';
 
 interface GroupFormProps {
   groupId: string;

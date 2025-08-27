@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useBookingStore } from '../store/bookingStore';
 import { GroupForm } from '../components/GroupForm';
 import { FORM_CONFIG } from '../utils/constants';
-import { validateStep1 } from '../schemas/validation';
 
 export const Step1FilmChoice: React.FC = () => {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ export const Step1FilmChoice: React.FC = () => {
     removeGroup, 
     goToNextStep,
     isStep1Valid,
-    getTotalPeopleAllGroups 
+ 
   } = useBookingStore();
 
   const handleAddGroup = () => {
@@ -45,9 +44,7 @@ export const Step1FilmChoice: React.FC = () => {
     }
   };
 
-  const totalPeople = getTotalPeopleAllGroups();
   const canAddGroup = groups.length < FORM_CONFIG.MAX_GROUPS;
-  const validationResult = validateStep1({ groups });
 
   return (
     <div className="container">

@@ -1,6 +1,4 @@
 // Main App component with routing and step management
-
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useBookingStore } from './store/bookingStore';
 import { Step1FilmChoice } from './pages/Step1FilmChoice';

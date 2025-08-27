@@ -166,6 +166,7 @@ The backend automatically applies these filters to queries:
 - **Validation Feedback**: Real-time validation with clear error messages
 - **Seat Availability**: Highlight screenings with insufficient capacity in RED
 - **Responsive Design**: Works on mobile, tablet, desktop
+- **Button Disabled State**: Navigation buttons are NOT disabled when validation fails - instead they remain clickable to trigger validation and show specific error messages to users
 
 ## Production Deployment Reminders
 - 📌 **Add REST API setting** for "aanmelding_educatie" version to production

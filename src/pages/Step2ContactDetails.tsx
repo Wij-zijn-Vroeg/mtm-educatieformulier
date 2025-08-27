@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AsyncSelect from 'react-select/async';
 import { useBookingStore } from '../store/bookingStore';
 import { organisationApi, addressApi } from '../api/endpoints';
-import type { OrganisationData, OrganisationTypeData, AddressData } from '../api/endpoints';
-import { validateStep2 } from '../schemas/validation';
+import type { OrganisationData, OrganisationTypeData } from '../api/endpoints';
 
 export const Step2ContactDetails: React.FC = () => {
   const { 
@@ -24,10 +23,8 @@ export const Step2ContactDetails: React.FC = () => {
   } = useBookingStore();
 
   // School search state
-  const [schoolOptions, setSchoolOptions] = useState<Array<{value: number, label: string, data: OrganisationData}>>([]);
   const [schoolTypes, setSchoolTypes] = useState<OrganisationTypeData[]>([]);
   const [isLoadingSchools, setIsLoadingSchools] = useState(false);
-  const [searchError, setSearchError] = useState<string | null>(null);
 
   // Field validation state
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -85,19 +82,15 @@ export const Step2ContactDetails: React.FC = () => {
     }
 
     setIsLoadingSchools(true);
-    setSearchError(null);
     
     try {
       const results = await organisationApi.searchSchools(inputValue);
-      const options = results.map(school => ({
+      return results.map(school => ({
         value: school.id,
         label: school.Name,
         data: school
       }));
-      setSchoolOptions(options);
-      return options;
     } catch (error) {
-      setSearchError('Zoeken naar scholen mislukt');
       console.error('School search failed:', error);
       return [];
     } finally {
@@ -306,15 +299,6 @@ export const Step2ContactDetails: React.FC = () => {
     return () => window.removeEventListener('validateAllFields', handleValidateAll);
   }, [teacher, school, Betalen_met_CJP, CJP_nummer, Akkoord_algemene_voorwaarden]);
 
-  const validationResult = validateStep2({
-    teacher,
-    school,
-    Naam_tweede_contactpersoon,
-    Betalen_met_CJP,
-    CJP_nummer,
-    Opmerkingen,
-    Akkoord_algemene_voorwaarden
-  });
 
   // Custom styles for React Select
   const selectStyles = {
@@ -514,7 +498,7 @@ export const Step2ContactDetails: React.FC = () => {
                 }
                 loadingMessage={() => "Zoeken naar scholen..."}
                 styles={selectStyles}
-                onInputChange={(inputValue) => {
+                onInputChange={() => {
                   // Clear school selection error when user starts typing
                   if (fieldErrors['school_selection']) {
                     setFieldErrors(prev => ({ ...prev, school_selection: '' }));

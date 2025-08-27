@@ -1,7 +1,7 @@
 // API endpoint functions
 
-import { apiClient, type ApiRecord } from './client';
-import { API_CONFIG, INSERT_TYPES } from '../utils/constants';
+import { apiClient } from './client';
+import { INSERT_TYPES } from '../utils/constants';
 
 // Data type interfaces based on actual API responses
 export interface ScreeningData {
@@ -255,7 +255,7 @@ export const bookingApi = {
       
       // Check availability for each group
       groups.forEach(group => {
-        const screening = screenings.find(s => s.id.toString() === group.selectedScreeningId);
+        const screening = screenings.find((s: any) => s.id.toString() === group.selectedScreeningId) as ScreeningData;
         if (screening && screening.Beschikbare_plekken_educatie !== null) {
           if (screening.Beschikbare_plekken_educatie < group.totalPeople) {
             conflicts.push({

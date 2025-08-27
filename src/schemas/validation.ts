@@ -17,11 +17,9 @@ export const groupSchema = z.object({
     .min(0, 'Aantal begeleiders mag niet negatief zijn')
     .max(FORM_CONFIG.MAX_GROUP_SIZE, `Maximum ${FORM_CONFIG.MAX_GROUP_SIZE} personen per groep`),
   stad: z.enum(['a', 'd'], {
-    errorMap: () => ({ message: 'Selecteer een stad' })
+    message: 'Selecteer een stad'
   }),
-  selectedScreeningId: z.string({
-    required_error: 'Selecteer een filmvertoning'
-  }).nullable().refine(val => val !== null, {
+  selectedScreeningId: z.string().nullable().refine(val => val !== null, {
     message: 'Selecteer een filmvertoning'
   })
 }).superRefine((data, ctx) => {

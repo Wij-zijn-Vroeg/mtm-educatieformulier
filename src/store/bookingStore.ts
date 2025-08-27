@@ -102,6 +102,7 @@ interface BookingStoreActions {
   
   // Form validation
   isStep1Valid: () => boolean;
+  isStep1ValidWithScreenings: (screeningsData: Record<string, any>) => boolean;
   isStep2Valid: () => boolean;
   
   // Utility
@@ -242,7 +243,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
           const hasBasicInfo = (
             group.Aantal_leerlingen_studenten > 0 &&
             group.educationTypeIds.length > 0 &&
-            group.Aantal_begeleiders >= 0 &&
+            group.Aantal_begeleiders > 0 &&
             group.stad.length > 0 &&
             group.selectedScreeningId !== null
           );
