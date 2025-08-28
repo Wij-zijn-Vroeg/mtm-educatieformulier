@@ -11,7 +11,7 @@ export interface ScreeningData {
   Title_in_use: string;
   Naam: string; // Location name (Festivallocatie.Naam)
   Beschikbare_plekken_educatie: number | null;
-  Education_type: number[]; // Array of Education_type IDs from Film
+  Geschikt_voor: number[]; // Array of Education_type IDs directly on Screening
   Stad: string; // City code ('a' for Amsterdam, 'd' for Den Haag)
   Capaciteit: number | null; // Total capacity (Festivallocatie.Capaciteit)
 }
@@ -64,7 +64,7 @@ export const screeningApi = {
       // Filter for films that have ANY of the selected education types
       // Query each ID as a single value using equals operator
       const educationFilters = educationTypeIds.map(typeId => ({
-        field: 'Film.Education_type',
+        field: 'Geschikt_voor',
         operator: 'equals',
         value: typeId
       }));
@@ -83,7 +83,7 @@ export const screeningApi = {
         'Datum', 
         'Aanvang',
         'Film.Title_in_use',
-        'Film.Education_type',
+        'Geschikt_voor',
         'Festivallocatie.Naam',
         'Festivallocatie.Stad',
         'Festivallocatie.Capaciteit',
