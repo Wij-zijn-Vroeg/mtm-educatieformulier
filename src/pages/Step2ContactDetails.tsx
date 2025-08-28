@@ -397,7 +397,7 @@ export const Step2ContactDetails: React.FC = () => {
           Stap 2: Contactgegevens
         </h1>
         <p className="text-gray-600">
-          Vul uw contactgegevens en schoolinformatie in.
+          Vul jouw contactgegevens en schoolinformatie in.
         </p>
       </div>
 
@@ -521,7 +521,7 @@ export const Step2ContactDetails: React.FC = () => {
                 isClearable
                 isSearchable
                 isDisabled={school.School_staat_niet_in_lijst}
-                placeholder="Typ de naam van uw school..."
+                placeholder="Typ de naam van jouw school..."
                 noOptionsMessage={({ inputValue }) => 
                   inputValue.length < 2 
                     ? "Typ minimaal 2 karakters om te zoeken" 

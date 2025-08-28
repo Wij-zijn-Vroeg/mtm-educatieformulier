@@ -112,7 +112,7 @@ export const Step1FilmChoice: React.FC = () => {
           Stap 1: Kies filmvertoning(en)
         </h1>
         <p className="text-gray-600">
-          Selecteer voor elke groep een filmvertoning. U kunt maximaal {FORM_CONFIG.MAX_GROUPS} groepen aanmelden.
+          Selecteer voor elke groep een filmvertoning. Je kunt maximaal {FORM_CONFIG.MAX_GROUPS} groepen aanmelden.
         </p>
       </div>
 
@@ -141,7 +141,7 @@ export const Step1FilmChoice: React.FC = () => {
             + Groep toevoegen
           </button>
           <p className="text-sm text-gray-500 mt-2">
-            U kunt nog {FORM_CONFIG.MAX_GROUPS - groups.length} groep(en) toevoegen
+            Je kunt nog {FORM_CONFIG.MAX_GROUPS - groups.length} groep(en) toevoegen
           </p>
         </div>
       )}
