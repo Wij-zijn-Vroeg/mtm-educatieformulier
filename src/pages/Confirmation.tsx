@@ -69,6 +69,13 @@ export const Confirmation: React.FC = () => {
     loadScreeningDetails();
   }, [store.groups]);
 
+  const handleReset = () => {
+    if (confirm('Weet u zeker dat u het formulier wilt wissen? Al uw ingevoerde gegevens gaan verloren.')) {
+      store.resetForm();
+      navigate('/stap-1');
+    }
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setSubmitResult(null);
@@ -124,10 +131,7 @@ export const Confirmation: React.FC = () => {
       setSubmitResult(result);
 
       if (result.success) {
-        // Reset form after successful submission
-        setTimeout(() => {
-          store.resetForm();
-        }, 5000);
+        // Form will be reset manually by user via button
       }
 
     } catch (error) {
@@ -154,7 +158,16 @@ export const Confirmation: React.FC = () => {
             U ontvangt binnenkort een bevestiging per e-mail met alle details van uw boeking.
           </p>
           <div className="success-footer">
-            <p>Het formulier wordt over 5 seconden automatisch gereset voor een nieuwe aanmelding.</p>
+            <button
+              type="button"
+              onClick={() => {
+                store.resetForm();
+                navigate('/stap-1');
+              }}
+              className="btn btn-primary"
+            >
+              Nieuwe aanmelding starten
+            </button>
           </div>
         </div>
       </div>
@@ -319,31 +332,41 @@ export const Confirmation: React.FC = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="navigation-buttons">
+      <div className="flex justify-between">
         <button
           type="button"
-          onClick={() => {
-            if (capacityWarnings.length > 0) {
-              store.setCurrentStep(1);
-              navigate('/stap-1');
-            } else {
-              store.setCurrentStep(2);
-              navigate('/stap-2');
-            }
-          }}
-          className="btn btn-secondary"
+          onClick={handleReset}
+          className="btn btn-outline text-red-600 hover:bg-red-50"
           disabled={isSubmitting}
         >
-          {capacityWarnings.length > 0 ? 'Terug naar filmkeuze' : 'Terug naar contactgegevens'}
+          Formulier wissen
         </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isSubmitting || capacityWarnings.length > 0}
-          className={`btn ${capacityWarnings.length > 0 ? 'btn-disabled' : 'btn-primary'}`}
-        >
-          {isSubmitting ? 'Versturen...' : 'Aanmelding versturen'}
-        </button>
+        <div className="flex space-x-4">
+          <button
+            type="button"
+            onClick={() => {
+              if (capacityWarnings.length > 0) {
+                store.setCurrentStep(1);
+                navigate('/stap-1');
+              } else {
+                store.setCurrentStep(2);
+                navigate('/stap-2');
+              }
+            }}
+            className="btn btn-secondary"
+            disabled={isSubmitting}
+          >
+            {capacityWarnings.length > 0 ? 'Terug naar filmkeuze' : 'Terug naar contactgegevens'}
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting || capacityWarnings.length > 0}
+            className={`btn ${capacityWarnings.length > 0 ? 'btn-disabled' : 'btn-primary'}`}
+          >
+            {isSubmitting ? 'Versturen...' : 'Aanmelding versturen'}
+          </button>
+        </div>
       </div>
     </div>
   );

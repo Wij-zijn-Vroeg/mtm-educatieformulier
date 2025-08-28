@@ -25,8 +25,14 @@ export interface ApiRecord<T = any> {
 
 // Determine the base URL based on environment
 const getBaseUrl = () => {
-  // TODO: In production, switch to PROD_DOMAIN based on environment
-  return API_CONFIG.DEV_DOMAIN;
+  // In development mode (vite dev server), use full dev domain
+  // In production build, use relative path (no domain) so it works on any server
+  if (import.meta.env.DEV) {
+    return API_CONFIG.DEV_DOMAIN;
+  }
+  
+  // Production: use relative path, server will handle the domain
+  return '';
 };
 
 // API client class with automatic authentication
@@ -34,7 +40,8 @@ export class CrossmarXApiClient {
   private baseUrl: string;
   
   constructor() {
-    this.baseUrl = `${getBaseUrl()}/engine/api/${API_CONFIG.VERSION}`;
+    const baseUrl = getBaseUrl();
+    this.baseUrl = baseUrl ? `${baseUrl}/engine/api/${API_CONFIG.VERSION}` : `/engine/api/${API_CONFIG.VERSION}`;
   }
 
   // Add authentication parameters to URL
@@ -48,7 +55,12 @@ export class CrossmarXApiClient {
     endpoint: string, 
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = new URL(`${this.baseUrl}${endpoint}`);
+    const fullUrl = `${this.baseUrl}${endpoint}`;
+    
+    // For relative URLs, use current location as base
+    const url = fullUrl.startsWith('/') 
+      ? new URL(fullUrl, window.location.origin)
+      : new URL(fullUrl);
     
     // Always add authentication as query parameters for all requests
     this.addAuthParams(url);
@@ -66,7 +78,17 @@ export class CrossmarXApiClient {
       const response = await fetch(url.toString(), config);
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Try to get error details from response body
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData: ApiResponse<T> = await response.json();
+          if (errorData.statusMessage?.message) {
+            errorMessage = errorData.statusMessage.message;
+          }
+        } catch {
+          // If we can't parse the error, use the default HTTP message
+        }
+        throw new Error(errorMessage);
       }
 
       const data: ApiResponse<T> = await response.json();

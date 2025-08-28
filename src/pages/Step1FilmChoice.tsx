@@ -15,6 +15,7 @@ export const Step1FilmChoice: React.FC = () => {
     removeGroup, 
     goToNextStep,
     isStep1Valid,
+    resetForm,
   } = useBookingStore();
   
   // Track screenings loaded by GroupForm components
@@ -78,6 +79,13 @@ export const Step1FilmChoice: React.FC = () => {
     }
   };
 
+  const handleReset = () => {
+    if (confirm('Weet u zeker dat u het formulier wilt wissen? Al uw ingevoerde gegevens gaan verloren.')) {
+      resetForm();
+      navigate('/stap-1');
+    }
+  };
+
   const canAddGroup = groups.length < FORM_CONFIG.MAX_GROUPS;
 
   return (
@@ -123,7 +131,13 @@ export const Step1FilmChoice: React.FC = () => {
 
       {/* Navigation */}
       <div className="flex justify-between">
-        <div /> {/* Empty div for spacing */}
+        <button
+          type="button"
+          onClick={handleReset}
+          className="btn btn-outline text-red-600 hover:bg-red-50"
+        >
+          Formulier wissen
+        </button>
         <button
           type="button"
           onClick={handleNext}

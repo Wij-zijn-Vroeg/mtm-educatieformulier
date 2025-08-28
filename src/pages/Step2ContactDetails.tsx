@@ -1,12 +1,14 @@
 // Step 2: Contact Details - Teacher and School information
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
 import { useBookingStore } from '../store/bookingStore';
 import { organisationApi, addressApi } from '../api/endpoints';
 import type { OrganisationData, OrganisationTypeData } from '../api/endpoints';
 
 export const Step2ContactDetails: React.FC = () => {
+  const navigate = useNavigate();
   const { 
     teacher, 
     school, 
@@ -19,7 +21,8 @@ export const Step2ContactDetails: React.FC = () => {
     Betalen_met_CJP,
     CJP_nummer,
     Opmerkingen,
-    Akkoord_algemene_voorwaarden
+    Akkoord_algemene_voorwaarden,
+    resetForm
   } = useBookingStore();
 
   // School search state
@@ -174,8 +177,11 @@ export const Step2ContactDetails: React.FC = () => {
       case 'Email_work':
         if (!value || value.trim().length === 0) {
           error = 'E-mailadres is verplicht';
-        } else if (!value.includes('@')) {
-          error = 'Voer een geldig e-mailadres in';
+        } else {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(value)) {
+            error = 'Voer een geldig e-mailadres in';
+          }
         }
         break;
       case 'Mobile_phone':
@@ -208,6 +214,14 @@ export const Step2ContactDetails: React.FC = () => {
         // Check if no school is selected at all
         if (!school.School_staat_niet_in_lijst && !school.lookupId) {
           error = 'Selecteer een school of vink aan dat uw school niet in de lijst staat';
+        }
+        break;
+      case 'E_mailadres_voor_factuur':
+        if (value && value.trim().length > 0) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(value)) {
+            error = 'Voer een geldig e-mailadres in';
+          }
         }
         break;
       case 'Akkoord_algemene_voorwaarden':
@@ -255,11 +269,18 @@ export const Step2ContactDetails: React.FC = () => {
 
   const handleSubmit = () => {
     if (isStep2Valid()) {
-      // Navigate to confirmation page (will be handled by App.tsx routing)
-      window.location.href = '/bevestiging';
+      // Navigate to confirmation page using React Router
+      navigate('/bevestiging');
     } else {
       // Trigger validation to show errors
       window.dispatchEvent(new CustomEvent('validateAllFields'));
+    }
+  };
+
+  const handleReset = () => {
+    if (confirm('Weet u zeker dat u het formulier wilt wissen? Al uw ingevoerde gegevens gaan verloren.')) {
+      resetForm();
+      navigate('/stap-1');
     }
   };
 
@@ -290,6 +311,9 @@ export const Step2ContactDetails: React.FC = () => {
       if (school.Factuuradres_keuze === '1' || school.School_staat_niet_in_lijst || !school.bekendFactuuradres) {
         validateField('Factuuradres', school.Factuuradres);
       }
+      
+      // Validate invoice email if provided
+      validateField('E_mailadres_voor_factuur', school.E_mailadres_voor_factuur);
       
       // Validate terms acceptance
       validateField('Akkoord_algemene_voorwaarden', Akkoord_algemene_voorwaarden);
@@ -680,10 +704,14 @@ export const Step2ContactDetails: React.FC = () => {
                 <input
                   type="email"
                   value={school.E_mailadres_voor_factuur}
-                  onChange={(e) => updateSchool({ E_mailadres_voor_factuur: e.target.value })}
+                  onChange={(e) => handleSchoolFieldChange('E_mailadres_voor_factuur', e.target.value)}
+                  onBlur={(e) => handleFieldBlur('E_mailadres_voor_factuur', e.target.value)}
                   placeholder="Alleen invullen als de factuur naar een apart e-mailadres verstuurd moet worden."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${fieldErrors['E_mailadres_voor_factuur'] ? 'border-red-600' : 'border-gray-300'}`}
                 />
+                {fieldErrors['E_mailadres_voor_factuur'] && (
+                  <div className="field-error">{fieldErrors['E_mailadres_voor_factuur']}</div>
+                )}
               </div>
             </div>
           </div>
@@ -789,18 +817,27 @@ export const Step2ContactDetails: React.FC = () => {
       <div className="flex justify-between mt-8">
         <button
           type="button"
-          onClick={goToPreviousStep}
-          className="btn btn-secondary"
+          onClick={handleReset}
+          className="btn btn-outline text-red-600 hover:bg-red-50"
         >
-          Vorige stap
+          Formulier wissen
         </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          className={`btn ${isStep2Valid() ? 'btn-primary' : 'btn btn-secondary'}`}
-        >
-          Aanmelding versturen
-        </button>
+        <div className="flex space-x-4">
+          <button
+            type="button"
+            onClick={goToPreviousStep}
+            className="btn btn-secondary"
+          >
+            Vorige stap
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className={`btn ${isStep2Valid() ? 'btn-primary' : 'btn btn-secondary'}`}
+          >
+            Aanmelding versturen
+          </button>
+        </div>
       </div>
     </div>
   );

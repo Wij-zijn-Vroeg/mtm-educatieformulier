@@ -264,12 +264,23 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
       isStep2Valid: () => {
         const { teacher, school, Akkoord_algemene_voorwaarden, Betalen_met_CJP, CJP_nummer } = get();
         
-        // Required teacher fields
+        // Email validation helper
+        const isValidEmail = (email: string): boolean => {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email);
+        };
+        
+        // Required teacher fields with email validation
         const teacherValid = (
           teacher.Last_name.length > 0 &&
           teacher.Email_work.length > 0 &&
+          isValidEmail(teacher.Email_work) &&
           teacher.Mobile_phone.length > 0
         );
+        
+        // Validate invoice email if provided
+        const invoiceEmailValid = !school.E_mailadres_voor_factuur || 
+          isValidEmail(school.E_mailadres_voor_factuur);
         
         // School selection valid
         const schoolValid = school.lookupId !== null || (
@@ -284,7 +295,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
         // CJP number required if checkbox checked
         const cjpValid = !Betalen_met_CJP || CJP_nummer.length > 0;
         
-        return teacherValid && schoolValid && checkboxesValid && cjpValid;
+        return teacherValid && schoolValid && checkboxesValid && cjpValid && invoiceEmailValid;
       },
 
       // Utility functions
@@ -314,7 +325,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
           Last_name: teacher.Last_name,
           Email_work: teacher.Email_work, // Correct field name
           Mobile_phone: teacher.Mobile_phone,
-          Newsletter_education: teacher.Newsletter_education,
+          Newsletter_education_: teacher.Newsletter_education,
           Type: 56, // Docent type (required)
           Other_school: schoolName, // Required to bypass school validation
         };
@@ -326,7 +337,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
         
         return {
           Name: school.schoolName, // Use dedicated school name field
-          Type: school.schoolType,
+          Type: [school.schoolType], // Send as array
         };
       },
 

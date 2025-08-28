@@ -9,7 +9,7 @@ function App() {
   const { currentStep } = useBookingStore();
 
   return (
-    <Router>
+    <Router basename="/forms/aanmelding_educatie">
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header>

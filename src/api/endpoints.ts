@@ -298,8 +298,9 @@ export const bookingApi = {
         } catch (error: any) {
           console.error('Organisation creation failed:', error);
           
-          // Check for duplicate name error
-          if (error.message.includes('Geen unieke waarden voor de velden: Naam')) {
+          // Check for duplicate name error (can include Naam, Subnaam or both)
+          if (error.message.includes('Geen unieke waarden voor de velden') && 
+              (error.message.includes('Naam') || error.message.includes('Subnaam'))) {
             throw new Error('Een school met deze naam bestaat al. Kies een andere naam of selecteer de bestaande school uit de lijst.');
           }
           
