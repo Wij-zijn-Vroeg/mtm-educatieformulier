@@ -295,7 +295,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({
               onBlur={(e) => handleFieldBlur('Toelichting', e.target.value)}
               className={fieldErrors['Toelichting'] ? 'field-invalid' : ''}
               rows={3}
-              placeholder="Geef een toelichting voor deze MBO/ISK groep"
+              placeholder="Bij MBO graag altijd een opleiding invullen en bij een ISK aanmelding graag ook het taalniveau doorgeven."
               required={needsToelichting}
             />
             {fieldErrors['Toelichting'] && (

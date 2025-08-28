@@ -370,3 +370,27 @@ export const bookingApi = {
     }
   }
 };
+
+// Default Settings API
+export interface DefaultSettingsData {
+  Introtekst_aanmelding_Educatie_MtMF: string;
+}
+
+export const defaultSettingsApi = {
+  /**
+   * Get default settings including intro text for the education form
+   */
+  async getDefaultSettings(): Promise<DefaultSettingsData> {
+    const queryDef = {
+      class: 'Default_settings'
+    };
+    
+    const records = await apiClient.query<DefaultSettingsData>(queryDef);
+    
+    if (records.length === 0) {
+      throw new Error('No default settings found');
+    }
+    
+    return records[0].data;
+  }
+};

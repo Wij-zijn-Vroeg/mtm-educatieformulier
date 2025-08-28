@@ -21,6 +21,7 @@ export const Step2ContactDetails: React.FC = () => {
     Betalen_met_CJP,
     CJP_nummer,
     Opmerkingen,
+    Akkoord_privacyverklaring,
     Akkoord_algemene_voorwaarden,
     resetForm
   } = useBookingStore();
@@ -224,6 +225,11 @@ export const Step2ContactDetails: React.FC = () => {
           }
         }
         break;
+      case 'Akkoord_privacyverklaring':
+        if (!value) {
+          error = 'U moet akkoord gaan met de privacyverklaring';
+        }
+        break;
       case 'Akkoord_algemene_voorwaarden':
         if (!value) {
           error = 'U moet akkoord gaan met de algemene voorwaarden';
@@ -315,13 +321,14 @@ export const Step2ContactDetails: React.FC = () => {
       // Validate invoice email if provided
       validateField('E_mailadres_voor_factuur', school.E_mailadres_voor_factuur);
       
-      // Validate terms acceptance
+      // Validate privacy and terms acceptance
+      validateField('Akkoord_privacyverklaring', Akkoord_privacyverklaring);
       validateField('Akkoord_algemene_voorwaarden', Akkoord_algemene_voorwaarden);
     };
 
     window.addEventListener('validateAllFields', handleValidateAll);
     return () => window.removeEventListener('validateAllFields', handleValidateAll);
-  }, [teacher, school, Betalen_met_CJP, CJP_nummer, Akkoord_algemene_voorwaarden]);
+  }, [teacher, school, Betalen_met_CJP, CJP_nummer, Akkoord_privacyverklaring, Akkoord_algemene_voorwaarden]);
 
 
   // Custom styles for React Select
@@ -489,7 +496,7 @@ export const Step2ContactDetails: React.FC = () => {
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">
-                  Ik wil graag de educatie nieuwsbrief ontvangen
+                  Ik wil graag op de hoogte blijven en schrijf me in voor de Movies that Matter educatie nieuwsbrief.
                 </span>
               </label>
             </div>
@@ -781,8 +788,32 @@ export const Step2ContactDetails: React.FC = () => {
                 onChange={(e) => updateField('Opmerkingen', e.target.value)}
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Eventuele opmerkingen..."
+                placeholder="Heb je nog vragen of opmerkingen? Wij horen het graag."
               />
+            </div>
+
+            <div>
+              <label className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  checked={Akkoord_privacyverklaring}
+                  onChange={(e) => {
+                    updateField('Akkoord_privacyverklaring', e.target.checked);
+                    if (fieldErrors['Akkoord_privacyverklaring']) {
+                      setFieldErrors(prev => ({ ...prev, Akkoord_privacyverklaring: '' }));
+                    }
+                  }}
+                  onBlur={(e) => handleFieldBlur('Akkoord_privacyverklaring', e.target.checked)}
+                  style={{ marginTop: '0.25rem', marginRight: '0.5rem' }}
+                  required
+                />
+                <span className="text-sm text-gray-700">
+                  Door dit formulier in te vullen, ga ik ermee akkoord dat mijn gegevens worden verzameld door Movies that Matter volgens de <a href='https://moviesthatmatter.nl/privacy-en-cookies/' target='_blank' className="text-blue-600 hover:underline">privacyverklaring</a>. *
+                </span>
+              </label>
+              {fieldErrors['Akkoord_privacyverklaring'] && (
+                <div className="field-error">{fieldErrors['Akkoord_privacyverklaring']}</div>
+              )}
             </div>
 
             <div>

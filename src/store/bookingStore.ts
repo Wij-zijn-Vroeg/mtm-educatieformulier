@@ -69,6 +69,7 @@ export interface BookingFormData {
   Betalen_met_CJP: boolean;
   CJP_nummer: string;
   Opmerkingen: string;
+  Akkoord_privacyverklaring: boolean;
   Akkoord_algemene_voorwaarden: boolean;
   
   // Hidden fields (set automatically)
@@ -113,6 +114,9 @@ interface BookingStoreActions {
   prepareAanmeldingData: () => any;
   preparePersonData: () => any;
   prepareOrganisationData: () => any;
+  
+  // Initialize app data
+  loadDefaultSettings: () => Promise<void>;
 }
 
 // Initial state
@@ -158,6 +162,7 @@ const initialState: BookingFormData = {
   Betalen_met_CJP: false,
   CJP_nummer: '',
   Opmerkingen: '',
+  Akkoord_privacyverklaring: false,
   Akkoord_algemene_voorwaarden: false,
   Soort_aanmelding: '0',
   Status: '0',
@@ -262,7 +267,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
       },
 
       isStep2Valid: () => {
-        const { teacher, school, Akkoord_algemene_voorwaarden, Betalen_met_CJP, CJP_nummer } = get();
+        const { teacher, school, Akkoord_algemene_voorwaarden, Akkoord_privacyverklaring, Betalen_met_CJP, CJP_nummer } = get();
         
         // Email validation helper
         const isValidEmail = (email: string): boolean => {
@@ -290,7 +295,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
         );
         
         // Required checkboxes
-        const checkboxesValid = Akkoord_algemene_voorwaarden;
+        const checkboxesValid = Akkoord_algemene_voorwaarden && Akkoord_privacyverklaring;
         
         // CJP number required if checkbox checked
         const cjpValid = !Betalen_met_CJP || CJP_nummer.length > 0;
@@ -312,7 +317,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
 
       // API data preparation
       preparePersonData: () => {
-        const { teacher, school } = get();
+        const { teacher, school, Akkoord_privacyverklaring } = get();
         
         // Determine school name for Other_school field
         const schoolName = school.School_staat_niet_in_lijst 
@@ -326,6 +331,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
           Email_work: teacher.Email_work, // Correct field name
           Mobile_phone: teacher.Mobile_phone,
           Newsletter_education_: teacher.Newsletter_education,
+          AVG: Akkoord_privacyverklaring, // Privacy agreement
           Type: 56, // Docent type (required)
           Other_school: schoolName, // Required to bypass school validation
         };
@@ -380,6 +386,20 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
         };
       },
 
+      // Initialize app data
+      loadDefaultSettings: async () => {
+        try {
+          const { defaultSettingsApi } = await import('../api/endpoints');
+          const settings = await defaultSettingsApi.getDefaultSettings();
+          set({ 
+            introText: settings.Introtekst_aanmelding_Educatie_MtMF || ''
+          });
+        } catch (error) {
+          console.error('Failed to load default settings:', error);
+          // Don't throw - app should work even if default settings fail to load
+        }
+      },
+
       // Reset
       resetForm: () => {
         set(initialState);
@@ -397,6 +417,7 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
         Betalen_met_CJP: state.Betalen_met_CJP,
         CJP_nummer: state.CJP_nummer,
         Opmerkingen: state.Opmerkingen,
+        Akkoord_privacyverklaring: state.Akkoord_privacyverklaring,
         Akkoord_algemene_voorwaarden: state.Akkoord_algemene_voorwaarden,
       }),
     }

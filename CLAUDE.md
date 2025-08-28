@@ -10,7 +10,7 @@ Multi-step booking form for educational film screenings as a React Single-Page A
 - **State Management**: Zustand
 - **Form Handling**: React Hook Form
 - **Validation**: Zod
-- **Styling**: Tailwind CSS
+- **Styling**: Custom CSS (utility-first approach)
 - **Backend**: CrossmarX REST API
 
 ## API Configuration
@@ -33,6 +33,24 @@ The backend automatically applies these filters to queries:
 - **Person Type**: `56` (Docent/Teacher)
 - **Address Type**: `6` (Factuur address)
 - **Organisation Type**: Query `organisation_type` class for available school types
+
+### API Testing with curl
+When testing API endpoints directly with curl, use the correct CrossmarX REST API 3.0 format:
+
+```bash
+# Correct format: GET method with URL-encoded querydef parameter
+curl -X GET "https://mtm.cx-develop.nl/engine/api/aanmelding_educatie/query?loginname=form_api_user&password=pw%24V19DM0sJv9QDAGcgp&querydef=%7B%22class%22%3A%22Default_settings%22%7D"
+
+# URL-decoded querydef: {"class":"Default_settings"}
+```
+
+**Important**: 
+- Use GET method, not POST for queries
+- Use `loginname` parameter (not `login`)
+- URL-encode the JSON querydef parameter
+- The querydef contains the query definition object as used in the application
+
+**API Documentation**: https://studio.crossmarx.nl/page/1202/crossmarx-rest-api-3-0
 
 ## Database Schema & API Endpoints
 

@@ -1,6 +1,6 @@
 // Step 1: Film Choice - Group selection and screening booking
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBookingStore } from '../store/bookingStore';
 import { GroupForm } from '../components/GroupForm';
@@ -16,10 +16,19 @@ export const Step1FilmChoice: React.FC = () => {
     goToNextStep,
     isStep1Valid,
     resetForm,
+    introText,
+    loadDefaultSettings,
   } = useBookingStore();
   
   // Track screenings loaded by GroupForm components
   const [allScreenings, setAllScreenings] = useState<Record<string, ScreeningData>>({});
+
+  // Load default settings on component mount
+  useEffect(() => {
+    if (!introText) {
+      loadDefaultSettings();
+    }
+  }, [introText, loadDefaultSettings]);
 
   // Callback for GroupForm to report loaded screenings
   const handleScreeningsLoaded = (_groupId: string, screenings: ScreeningData[]) => {
@@ -90,6 +99,14 @@ export const Step1FilmChoice: React.FC = () => {
 
   return (
     <div className="container">
+      {/* Intro Text from Default Settings */}
+      {introText && (
+        <div 
+          className="intro-text mb-8"
+          dangerouslySetInnerHTML={{ __html: introText }}
+        />
+      )}
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Stap 1: Kies filmvertoning(en)

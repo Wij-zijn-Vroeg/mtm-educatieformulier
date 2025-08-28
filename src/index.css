@@ -542,6 +542,67 @@ input[type="checkbox"], input[type="radio"] {
   margin-top: 2rem;
 }
 
+/* Intro text styling for HTML content from API */
+.intro-text {
+  background-color: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.intro-text h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.intro-text h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
+}
+
+.intro-text p {
+  color: var(--gray-700);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.intro-text ul {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  color: var(--gray-700);
+}
+
+.intro-text li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.intro-text a {
+  color: var(--mtm-blue);
+  text-decoration: none;
+}
+
+.intro-text a:hover {
+  text-decoration: underline;
+}
+
+.intro-text img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.intro-text strong,
+.intro-text em {
+  color: var(--gray-900);
+}
+
 /* Responsive */
 @media (min-width: 768px) {
   .md\:grid-cols-2 {
