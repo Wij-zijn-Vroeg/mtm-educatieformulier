@@ -12,7 +12,7 @@ export interface GroupData {
   educationTypeNames: string[]; // Display names of selected types
   Toelichting?: string; // Only for MBO/ISK (stored in separate field if needed)
   Aantal_begeleiders: number;
-  stad: 'a' | 'd' | ''; // Amsterdam or Den Haag (for screening filter)
+  stad: 'Amsterdam' | 'Den Haag' | ''; // City name (for screening filter)
   selectedScreeningId: string | null;
 }
 

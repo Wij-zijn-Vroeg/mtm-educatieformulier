@@ -359,8 +359,8 @@ export const GroupForm: React.FC<GroupFormProps> = ({
             required
           >
             <option value="">Selecteer een stad</option>
-            <option value="a">Amsterdam</option>
-            <option value="d">Den Haag</option>
+            <option value="Amsterdam">Amsterdam</option>
+            <option value="Den Haag">Den Haag</option>
           </select>
           {fieldErrors['stad'] && (
             <div className="field-error">{fieldErrors['stad']}</div>

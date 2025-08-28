@@ -69,9 +69,9 @@ curl -X GET "https://mtm.cx-develop.nl/engine/api/aanmelding_educatie/query?logi
     "Beschikbare_plekken_educatie" // Available seats
   ],
   "filter": {
-    "field": "Festivallocatie.Stad", 
+    "field": "Stad", 
     "operator": "equals", 
-    "value": "a" // 'a'=Amsterdam, 'd'=Den Haag
+    "value": "Amsterdam" // 'Amsterdam' or 'Den Haag'
   }
 }
 ```

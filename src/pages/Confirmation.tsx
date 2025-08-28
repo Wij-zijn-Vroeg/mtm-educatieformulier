@@ -31,8 +31,8 @@ export const Confirmation: React.FC = () => {
       try {
         // Always fetch fresh screening data to get current available seats
         const [amsterdamScreenings, denHaagScreenings] = await Promise.all([
-          screeningApi.getScreenings('a'),
-          screeningApi.getScreenings('d')
+          screeningApi.getScreenings('Amsterdam'),
+          screeningApi.getScreenings('Den Haag')
         ]);
         
         const allScreenings = [...amsterdamScreenings, ...denHaagScreenings];
@@ -152,10 +152,10 @@ export const Confirmation: React.FC = () => {
           <div className="success-icon">✓</div>
           <h1>Aanmelding succesvol verstuurd!</h1>
           <p className="success-text">
-            Uw aanmelding is ontvangen met referentienummer: <strong>{submitResult.bookingId}</strong>
+            Jouw aanmelding is in goede orde ontvangen met referentienummer: <strong>{submitResult.bookingId}</strong>
           </p>
           <p className="success-subtext">
-            U ontvangt binnenkort een bevestiging per e-mail met alle details van uw boeking.
+            Je ontvangt binnenkort een bevestiging per e-mail met alle details van jouw boeking.
           </p>
           <div className="success-footer">
             <button
@@ -214,7 +214,7 @@ export const Confirmation: React.FC = () => {
       <div className="mb-8">
         <h1>Bevestiging aanmelding</h1>
         <p className="page-subtitle">
-          Controleer uw gegevens en verstuur de aanmelding.
+          Controleer hieronder de gegevens van jouw aanmelding en verstuur deze.
         </p>
       </div>
 
@@ -269,7 +269,7 @@ export const Confirmation: React.FC = () => {
                         <strong>Locatie:</strong> {screening.Naam}
                       </div>
                       <div>
-                        <strong>Stad:</strong> {screening.Stad === 'a' ? 'Amsterdam' : 'Den Haag'}
+                        <strong>Stad:</strong> {screening.Stad}
                       </div>
                       {screening.Capaciteit && (
                         <div>
@@ -327,6 +327,21 @@ export const Confirmation: React.FC = () => {
                   : store.school.schoolName
               }
             </div>
+            {store.school.Factuuradres && (
+              <div>
+                <strong>Factuuradres:</strong> {store.school.Factuuradres}
+              </div>
+            )}
+            {store.school.Factuurreferentie && (
+              <div>
+                <strong>Factuurreferentie:</strong> {store.school.Factuurreferentie}
+              </div>
+            )}
+            {store.school.E_mailadres_voor_factuur && store.school.E_mailadres_voor_factuur !== store.teacher.Email_work && (
+              <div>
+                <strong>E-mail factuur:</strong> {store.school.E_mailadres_voor_factuur}
+              </div>
+            )}
           </div>
         </div>
       </div>

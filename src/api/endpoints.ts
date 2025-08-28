@@ -12,7 +12,7 @@ export interface ScreeningData {
   Naam: string; // Location name (Festivallocatie.Naam)
   Beschikbare_plekken_educatie: number | null;
   Geschikt_voor: number[]; // Array of Education_type IDs directly on Screening
-  Stad: string; // City code ('a' for Amsterdam, 'd' for Den Haag)
+  Stad: string; // City name ('Amsterdam' or 'Den Haag')
   Capaciteit: number | null; // Total capacity (Festivallocatie.Capaciteit)
 }
 
@@ -54,9 +54,9 @@ export const screeningApi = {
    * Get screenings filtered by city and optionally by education type IDs
    * Backend automatically applies soort_vertoning: 103 and film.extra_identifier: 178
    */
-  async getScreenings(city: 'a' | 'd', educationTypeIds?: number[]): Promise<ScreeningData[]> {
+  async getScreenings(city: 'Amsterdam' | 'Den Haag', educationTypeIds?: number[]): Promise<ScreeningData[]> {
     const filters: any[] = [
-      { field: 'Festivallocatie.Stad', operator: 'equals', value: city }
+      { field: 'Stad', operator: 'equals', value: city }
     ];
 
     // Add education type filter if provided
@@ -85,7 +85,7 @@ export const screeningApi = {
         'Film.Title_in_use',
         'Geschikt_voor',
         'Festivallocatie.Naam',
-        'Festivallocatie.Stad',
+        'Stad',
         'Festivallocatie.Capaciteit',
         'Beschikbare_plekken_educatie'
       ],
