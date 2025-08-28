@@ -159,7 +159,8 @@ curl -X GET "https://mtm.cx-develop.nl/engine/api/aanmelding_educatie/query?logi
 
 ### Step 1: Film Choice
 - **Max Groups**: 3 per submission
-- **Max Group Size**: 345 people total (students + supervisors)
+- **Max Group Size**: 340 people total (students + supervisors)
+- **Max Students**: 200 students per group
 - **Required per Group**:
   - Number of students
   - Education type and year

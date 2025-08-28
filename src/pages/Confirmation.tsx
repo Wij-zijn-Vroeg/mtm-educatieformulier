@@ -232,7 +232,7 @@ export const Confirmation: React.FC = () => {
                   <div key={index}>{warning}</div>
                 ))}
                 <div className="mt-3 font-medium">
-                  De beschikbare plekken zijn veranderd sinds u de eerste stap heeft ingevuld. U kunt de aanmelding niet versturen totdat u uw groepsgrootte aanpast of een andere vertoning selecteert.
+                  De beschikbare plekken zijn veranderd sinds je de eerste stap hebt ingevuld. Je kunt de aanmelding niet versturen totdat je jouw groepsgrootte aanpast of een andere vertoning selecteert.
                 </div>
               </div>
             </div>

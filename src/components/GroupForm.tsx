@@ -93,8 +93,8 @@ export const GroupForm: React.FC<GroupFormProps> = ({
       case 'Aantal_leerlingen_studenten':
         if (!value || value < 1) {
           error = 'Aantal leerlingen moet minimaal 1 zijn';
-        } else if (value > FORM_CONFIG.MAX_GROUP_SIZE) {
-          error = `Maximum ${FORM_CONFIG.MAX_GROUP_SIZE} leerlingen per groep`;
+        } else if (value > FORM_CONFIG.MAX_STUDENTS_SIZE) {
+          error = `Maximum ${FORM_CONFIG.MAX_STUDENTS_SIZE} leerlingen per groep`;
         }
         break;
       case 'educationTypeIds':
@@ -243,7 +243,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({
           <input
             type="number"
             min="1"
-            max={FORM_CONFIG.MAX_GROUP_SIZE}
+            max={FORM_CONFIG.MAX_STUDENTS_SIZE}
             value={group.Aantal_leerlingen_studenten || ''}
             onChange={(e) => handleFieldChange('Aantal_leerlingen_studenten', parseInt(e.target.value) || 0)}
             onBlur={(e) => handleFieldBlur('Aantal_leerlingen_studenten', parseInt(e.target.value) || 0)}
@@ -429,7 +429,7 @@ export const GroupForm: React.FC<GroupFormProps> = ({
                             <td className="text-gray-900" style={{ padding: '0.75rem' }}>{formatDutchDate(screening.Datum)}</td>
                             <td className="text-gray-900" style={{ padding: '0.75rem' }}>{formatTime(screening.Aanvang)}</td>
                             <td className="text-gray-900 font-medium" style={{ padding: '0.75rem' }}>{screening.Title_in_use}</td>
-                            <td className="text-gray-900" style={{ padding: '0.75rem' }}>{screening.Stad === 'a' ? 'Amsterdam' : 'Den Haag'}</td>
+                            <td className="text-gray-900" style={{ padding: '0.75rem' }}>{screening.Stad}</td>
                             <td className="text-gray-900" style={{ padding: '0.75rem' }}>{screening.Naam}</td>
                             <td className="text-gray-900" style={{ padding: '0.75rem' }}>{screening.Capaciteit || '-'}</td>
                             <td className={hasEnoughSeats ? 'text-green-600' : 'text-red-600 font-medium'} style={{ padding: '0.75rem' }}>

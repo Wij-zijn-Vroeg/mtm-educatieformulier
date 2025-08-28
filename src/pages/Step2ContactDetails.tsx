@@ -91,7 +91,7 @@ export const Step2ContactDetails: React.FC = () => {
       const results = await organisationApi.searchSchools(inputValue);
       return results.map(school => ({
         value: school.id,
-        label: school.Name,
+        label: school.Subname ? `${school.Name} - ${school.Subname}` : school.Name,
         data: school
       }));
     } catch (error) {
@@ -106,7 +106,7 @@ export const Step2ContactDetails: React.FC = () => {
     if (selectedOption) {
       updateSchool({
         lookupId: selectedOption.data.id,
-        selectedSchoolName: selectedOption.data.Name,
+        selectedSchoolName: selectedOption.data.Subname ? `${selectedOption.data.Name} - ${selectedOption.data.Subname}` : selectedOption.data.Name,
         School_staat_niet_in_lijst: false
       });
     } else {
@@ -387,7 +387,7 @@ export const Step2ContactDetails: React.FC = () => {
 
   // Get current selected value for React Select
   const selectedSchoolValue = school.lookupId 
-    ? { value: school.lookupId, label: school.selectedSchoolName, data: { id: school.lookupId, Name: school.selectedSchoolName } as OrganisationData }
+    ? { value: school.lookupId, label: school.selectedSchoolName, data: { id: school.lookupId, Name: school.selectedSchoolName, Subname: null } as OrganisationData }
     : null;
 
   return (
@@ -866,7 +866,7 @@ export const Step2ContactDetails: React.FC = () => {
             onClick={handleSubmit}
             className={`btn ${isStep2Valid() ? 'btn-primary' : 'btn btn-secondary'}`}
           >
-            Aanmelding versturen
+            Aanmelding controleren
           </button>
         </div>
       </div>

@@ -19,6 +19,7 @@ export interface ScreeningData {
 export interface OrganisationData {
   id: number;
   Name: string;
+  Subname: string | null;
 }
 
 export interface OrganisationTypeData {
@@ -131,8 +132,14 @@ export const organisationApi = {
   async searchSchools(searchTerm: string): Promise<OrganisationData[]> {
     const queryDef = {
       class: 'Organisation',
-      resultFields: ['Id', 'Name'],
-      filter: { field: 'Name', operator: 'like', value: `%${searchTerm}%` }
+      resultFields: ['Id', 'Name', 'Subname'],
+      filter: {
+        operator: 'or',
+        children: [
+          { field: 'Name', operator: 'like', value: `%${searchTerm}%` },
+          { field: 'Subname', operator: 'like', value: `%${searchTerm}%` }
+        ]
+      }
     };
 
     const records = await apiClient.query<OrganisationData>(queryDef);

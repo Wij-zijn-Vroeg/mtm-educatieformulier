@@ -8,7 +8,7 @@ export const groupSchema = z.object({
   id: z.string(),
   Aantal_leerlingen_studenten: z.number()
     .min(1, 'Aantal leerlingen moet minimaal 1 zijn')
-    .max(FORM_CONFIG.MAX_GROUP_SIZE, `Maximum ${FORM_CONFIG.MAX_GROUP_SIZE} personen per groep`),
+    .max(FORM_CONFIG.MAX_STUDENTS_SIZE, `Maximum ${FORM_CONFIG.MAX_STUDENTS_SIZE} leerlingen per groep`),
   educationTypeIds: z.array(z.number())
     .min(1, 'Selecteer minimaal één onderwijstype'),
   educationTypeNames: z.array(z.string()),

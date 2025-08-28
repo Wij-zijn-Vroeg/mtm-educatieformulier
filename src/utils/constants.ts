@@ -22,7 +22,8 @@ export const API_CONFIG = {
 
 export const FORM_CONFIG = {
   MAX_GROUPS: 3,
-  MAX_GROUP_SIZE: 345, // max aantal leerlingen + begeleiders per groep
+  MAX_GROUP_SIZE: 340, // max aantal leerlingen + begeleiders per groep
+  MAX_STUDENTS_SIZE: 200, // max aantal leerlingen per groep
 } as const;
 
 export const EDUCATION_TYPES = {
