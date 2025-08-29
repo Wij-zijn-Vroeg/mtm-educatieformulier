@@ -68,7 +68,7 @@ function App() {
             {/* Confirmation Page */}
             <Route 
               path="/bevestiging" 
-              element={currentStep >= 2 ? <Confirmation /> : <Navigate to="/stap-1" replace />} 
+              element={currentStep >= 3 ? <Confirmation /> : <Navigate to="/stap-1" replace />} 
             />
             
             {/* Default redirect */}

@@ -327,11 +327,24 @@ export const Confirmation: React.FC = () => {
                   : store.school.schoolName
               }
             </div>
-            {store.school.Factuuradres && (
-              <div>
-                <strong>Factuuradres:</strong> {store.school.Factuuradres}
-              </div>
-            )}
+{/* Display correct invoice address based on selection */}
+            {(() => {
+              // Determine which address to show
+              let invoiceAddress = '';
+              if (store.school.Factuuradres_keuze === '0' && store.school.existingFactuuradres) {
+                // "Hetzelfde als schooladres" selected and we have known address
+                invoiceAddress = store.school.existingFactuuradres;
+              } else if (store.school.Factuuradres) {
+                // Manual address entered or school not in list
+                invoiceAddress = store.school.Factuuradres;
+              }
+              
+              return invoiceAddress ? (
+                <div>
+                  <strong>Factuuradres:</strong> {invoiceAddress}
+                </div>
+              ) : null;
+            })()}
             {store.school.Factuurreferentie && (
               <div>
                 <strong>Factuurreferentie:</strong> {store.school.Factuurreferentie}

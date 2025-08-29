@@ -16,6 +16,7 @@ export const Step2ContactDetails: React.FC = () => {
     updateSchool, 
     updateField,
     goToPreviousStep,
+    setCurrentStep,
     isStep2Valid,
     Naam_tweede_contactpersoon,
     Betalen_met_CJP,
@@ -275,6 +276,8 @@ export const Step2ContactDetails: React.FC = () => {
 
   const handleSubmit = () => {
     if (isStep2Valid()) {
+      // Set current step to 3 for confirmation page
+      setCurrentStep(3);
       // Navigate to confirmation page using React Router
       navigate('/bevestiging');
     } else {
@@ -750,7 +753,7 @@ export const Step2ContactDetails: React.FC = () => {
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">
-                  Betalen met CJP/MBO card
+                  Ik wil graag met de CJP cultuurkaart betalen.
                 </span>
               </label>
             </div>

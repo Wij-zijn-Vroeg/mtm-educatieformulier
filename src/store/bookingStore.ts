@@ -49,7 +49,7 @@ export interface SchoolData {
 
 export interface BookingFormData {
   // Navigation
-  currentStep: 1 | 2;
+  currentStep: 1 | 2 | 3;
   
   // Content management (loaded from API/DB)
   introText: string;
@@ -80,7 +80,7 @@ export interface BookingFormData {
 // Store actions interface
 interface BookingStoreActions {
   // Navigation
-  setCurrentStep: (step: 1 | 2) => void;
+  setCurrentStep: (step: 1 | 2 | 3) => void;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
   
@@ -258,11 +258,12 @@ export const useBookingStore = create<BookingFormData & BookingStoreActions>()(
           const needsToelichting = group.educationTypeIds.some(id => mboIskIds.includes(id));
           const hasRequiredToelichting = !needsToelichting || (group.Toelichting && group.Toelichting.length > 0);
           
-          // Check group size limit
+          // Check group size limits
           const totalPeople = group.Aantal_leerlingen_studenten + group.Aantal_begeleiders;
-          const withinLimit = totalPeople <= FORM_CONFIG.MAX_GROUP_SIZE;
+          const withinGroupLimit = totalPeople <= FORM_CONFIG.MAX_GROUP_SIZE;
+          const studentsWithinLimit = group.Aantal_leerlingen_studenten <= FORM_CONFIG.MAX_STUDENTS_SIZE;
           
-          return hasBasicInfo && hasRequiredToelichting && withinLimit;
+          return hasBasicInfo && hasRequiredToelichting && withinGroupLimit && studentsWithinLimit;
         });
       },
 
