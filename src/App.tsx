@@ -56,19 +56,19 @@ function App() {
             {/* Step 1: Film Choice */}
             <Route 
               path="/stap-1" 
-              element={currentStep >= 1 ? <Step1FilmChoice /> : <Navigate to="/stap-1" replace />} 
+              element={<Step1FilmChoice />} 
             />
             
             {/* Step 2: Contact Details */}
             <Route 
               path="/stap-2" 
-              element={currentStep >= 2 ? <Step2ContactDetails /> : <Navigate to="/stap-1" replace />} 
+              element={<Step2ContactDetails />} 
             />
             
             {/* Confirmation Page */}
             <Route 
               path="/bevestiging" 
-              element={currentStep >= 3 ? <Confirmation /> : <Navigate to="/stap-1" replace />} 
+              element={<Confirmation />} 
             />
             
             {/* Default redirect */}

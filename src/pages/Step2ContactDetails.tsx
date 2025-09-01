@@ -859,7 +859,10 @@ export const Step2ContactDetails: React.FC = () => {
         <div className="flex space-x-4">
           <button
             type="button"
-            onClick={goToPreviousStep}
+            onClick={() => {
+              goToPreviousStep();
+              navigate('/stap-1');
+            }}
             className="btn btn-secondary"
           >
             Vorige stap
