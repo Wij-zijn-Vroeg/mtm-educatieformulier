@@ -1,14 +1,12 @@
 // Confirmation page for successful booking submission
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useBookingStore } from '../store/bookingStore';
 import { bookingApi, screeningApi } from '../api/endpoints';
 import type { ScreeningData } from '../api/endpoints';
 import { formatDutchDate, formatTime } from '../utils/dateUtils';
 
 export const Confirmation: React.FC = () => {
-  const navigate = useNavigate();
   const store = useBookingStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<{
@@ -72,7 +70,7 @@ export const Confirmation: React.FC = () => {
   const handleReset = () => {
     if (confirm('Weet u zeker dat u het formulier wilt wissen? Al uw ingevoerde gegevens gaan verloren.')) {
       store.resetForm();
-      navigate('/stap-1');
+      // resetForm already sets currentStep to 1
     }
   };
 
@@ -162,7 +160,7 @@ export const Confirmation: React.FC = () => {
               type="button"
               onClick={() => {
                 store.resetForm();
-                navigate('/stap-1');
+                // resetForm already sets currentStep to 1
               }}
               className="btn btn-primary"
             >
@@ -191,7 +189,6 @@ export const Confirmation: React.FC = () => {
             <button
               onClick={() => {
                 store.setCurrentStep(2);
-                navigate('/stap-2');
               }}
               className="btn btn-primary"
             >
@@ -375,10 +372,8 @@ export const Confirmation: React.FC = () => {
             onClick={() => {
               if (capacityWarnings.length > 0) {
                 store.setCurrentStep(1);
-                navigate('/stap-1');
               } else {
                 store.setCurrentStep(2);
-                navigate('/stap-2');
               }
             }}
             className="btn btn-secondary"

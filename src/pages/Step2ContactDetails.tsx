@@ -1,14 +1,12 @@
 // Step 2: Contact Details - Teacher and School information
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
 import { useBookingStore } from '../store/bookingStore';
 import { organisationApi, addressApi } from '../api/endpoints';
 import type { OrganisationData, OrganisationTypeData } from '../api/endpoints';
 
 export const Step2ContactDetails: React.FC = () => {
-  const navigate = useNavigate();
   const { 
     teacher, 
     school, 
@@ -278,8 +276,6 @@ export const Step2ContactDetails: React.FC = () => {
     if (isStep2Valid()) {
       // Set current step to 3 for confirmation page
       setCurrentStep(3);
-      // Navigate to confirmation page using React Router
-      navigate('/bevestiging');
     } else {
       // Trigger validation to show errors
       window.dispatchEvent(new CustomEvent('validateAllFields'));
@@ -289,7 +285,7 @@ export const Step2ContactDetails: React.FC = () => {
   const handleReset = () => {
     if (confirm('Weet u zeker dat u het formulier wilt wissen? Al uw ingevoerde gegevens gaan verloren.')) {
       resetForm();
-      navigate('/stap-1');
+      // resetForm already sets currentStep to 1
     }
   };
 
@@ -859,10 +855,7 @@ export const Step2ContactDetails: React.FC = () => {
         <div className="flex space-x-4">
           <button
             type="button"
-            onClick={() => {
-              goToPreviousStep();
-              navigate('/stap-1');
-            }}
+            onClick={goToPreviousStep}
             className="btn btn-secondary"
           >
             Vorige stap

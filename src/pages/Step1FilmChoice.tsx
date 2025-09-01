@@ -1,14 +1,12 @@
 // Step 1: Film Choice - Group selection and screening booking
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useBookingStore } from '../store/bookingStore';
 import { GroupForm } from '../components/GroupForm';
 import { FORM_CONFIG } from '../utils/constants';
 import type { ScreeningData } from '../api/endpoints';
 
 export const Step1FilmChoice: React.FC = () => {
-  const navigate = useNavigate();
   const { 
     groups, 
     addGroup, 
@@ -80,7 +78,6 @@ export const Step1FilmChoice: React.FC = () => {
     if (basicValidation && capacityValid) {
       console.log('Calling goToNextStep');
       goToNextStep();
-      navigate('/stap-2');
     } else {
       console.log('Step 1 validation failed - basic:', basicValidation, 'capacity:', capacityValid);
       // Trigger validation on all group forms to show errors
@@ -91,7 +88,7 @@ export const Step1FilmChoice: React.FC = () => {
   const handleReset = () => {
     if (confirm('Weet u zeker dat u het formulier wilt wissen? Al uw ingevoerde gegevens gaan verloren.')) {
       resetForm();
-      navigate('/stap-1');
+      // resetForm already sets currentStep to 1
     }
   };
 
